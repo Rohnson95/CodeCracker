@@ -5,6 +5,7 @@
 #include <fstream>
 #include <conio.h>
 #include <limits>
+#include <openssl/evp.h>
 struct UserInfo
 {
     std::string email;
