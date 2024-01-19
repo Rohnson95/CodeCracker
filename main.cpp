@@ -29,8 +29,8 @@ void writeToFile(const UserInfo &user)
 
     if (userFile.is_open())
     {
-        userFile << " Email: " << user.email << " Password: " << user.password << "\n";
-        userFile << "-----------------------------------\n";
+        userFile << user.email << " " << user.password;
+        userFile << "\n";
         userFile.close();
         std::cout << "User Information successfully added\n";
     }
@@ -57,34 +57,6 @@ bool doesEmailExist(const std::string &emailToCheck)
     inFile.close();
     return false;
 }
-void getPassword(std::string &password)
-{
-    char ch;
-    while ((ch = _getch()) != 13)
-    {
-        if (ch == 8)
-        {
-            if (!password.empty())
-            {
-                _putch('\b');
-                _putch(' ');
-                _putch('\b');
-                password.pop_back();
-            }
-        }
-        else if (isprint(ch))
-        {
-            std::cout << '*';
-            password.push_back(ch);
-        }
-    }
-    password.erase(std::remove(password.begin(), password.end(), '\n'), password.end());
-    password.erase(std::remove(password.begin(), password.end(), '\r'), password.end());
-
-    std::cout << std::endl;
-    std::cin.clear();
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-}
 UserInfo createUser()
 {
     UserInfo user;
@@ -103,9 +75,8 @@ UserInfo createUser()
     }
     std::cout << "Passwords Must Contain\n - At least 8 Characters\n - At least one uppercase letter\n - At least one lowercase letter\n - At least one digit\n - At least one special character" << std::endl;
     std::cout << "Enter Desired Password\n";
-
-    // Changes Characters of password
-    getPassword(user.password);
+    std::cin >> user.password;
+    // getPassword(user.password);
 
     if (!user.isValidPassword())
     {
@@ -117,49 +88,47 @@ UserInfo createUser()
 
     return user;
 }
-
-bool loggedIn(UserInfo &user)
+void trimWhitespace(std::string &str)
 {
-    std::cout << "Enter Email: " << std::endl;
-    std::cin >> user.email;
-    std::cout << "Enter Password: ";
-    getPassword(user.password);
-
-    user.password.erase(std::remove(user.password.begin(), user.password.end(), '\n'), user.password.end());
-    std::ifstream inFile("users.txt");
-    std::string line;
-    bool isUserFound = false;
-
-    while (std::getline(inFile, line))
+    str.erase(0, str.find_first_not_of(" \t\n\r\f\v"));
+    str.erase(str.find_last_not_of(" \t\n\r\f\v") + 1);
+}
+int loggedIn(UserInfo &user)
+{
+    std::string login_email;
+    std::string login_password;
+    std::fstream pull("users.txt", std::ios::in);
+    if (!pull.is_open())
     {
-        line.erase(std::remove(line.begin(), line.end(), '\n'), line.end());
-        line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
+        std::cout << "File not loaded!" << std::endl;
+        return -1;
+    }
+    std::cout << "Enter email: ";
+    std::cin >> login_email;
+    trimWhitespace(login_email);
 
-        // Check if the line contains both email and password
-        size_t emailPos = line.find(" Email: " + user.email);
-        size_t passwordPos = line.find(" Password: " + user.password);
-
-        if (emailPos != std::string::npos && passwordPos != std::string::npos)
+    while (pull >> user.email >> user.password)
+    {
+        if (login_email == user.email)
         {
-            isUserFound = true;
-            break;
+            std::cout << "Enter password: ";
+            std::cin >> login_password;
+
+            while (login_password != user.password)
+            {
+                std::cout << "Wrong Password. Try again\nEnter Password: ";
+                std::cin >> login_password;
+            }
+            std::cout << "Login Successful" << std::endl;
+            pull.close();
+            pull.open("users.txt", std::ios::in);
+            return 0;
         }
     }
-
-    inFile.close();
-    if (isUserFound)
-    {
-        std::cout << "Successful Login" << std::endl;
-    }
-    else
-    {
-        std::cout << "---Login Failed---\n"
-                  << std::endl;
-    }
-
-    return isUserFound;
+    std::cout << "Email not found." << std::endl;
+    pull.close();
+    return 1;
 }
-
 void login()
 {
     UserInfo user;
@@ -185,7 +154,6 @@ void login()
             std::cout << "Invalid choice. Try again.\n";
         }
         std::cin.clear();
-        // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     } while (choice != 3);
 }
 int main()
