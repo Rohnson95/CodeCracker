@@ -14,11 +14,13 @@ else
 	OUTPUTDIR=bin/release
 endif
 
+OPENSSL_INCLUDE = -IC:/msys64/mingw64/include
+OPENSSL_LIBS = -LC:/msys64/mingw64/lib -lssl -lcrypto
 
 OBJS =  $(addprefix $(OUTPUTDIR)/,$(SOURCES:.cpp=.o))
 
 $(PROG): $(OUTPUTDIR) $(OBJS) 
-	$(CC) $(CFLAGS) -o $(PROG) $(OBJS)
+	$(CC) $(CFLAGS) $(OPENSSL_INCLUDE) -o $(PROG) $(OBJS) $(OPENSSL_LIBS)
 
 $(OUTPUTDIR)/%.o: %.cpp $(DEPS)
 	$(CC) $(CFLAGS) -o $@ -c $< 
