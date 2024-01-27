@@ -6,6 +6,7 @@
 #include <conio.h>
 #include <limits>
 #include <openssl/evp.h>
+#include <openssl/rand.h>
 struct UserInfo
 {
     std::string email;
@@ -23,6 +24,20 @@ struct UserInfo
         return std::regex_match(password, pattern);
     }
 };
+std::string generateSalt()
+{
+    const int saltLength = 16;
+    unsigned char buffer[saltLength];
+    RAND_bytes(buffer, saltLength);
+
+    std::string salt;
+    for (int i = 0; i < saltLength; ++i)
+    {
+        salt += char('a' + (buffer[i] % 26));
+    }
+
+    return salt;
+}
 std::string sha256(const std::string &input)
 {
     EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
@@ -198,6 +213,9 @@ void login()
 }
 int main()
 {
+    std::string salt = generateSalt();
+
+    std::cout << "Salt: " << salt << std::endl;
     login();
     return 0;
 }
