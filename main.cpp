@@ -61,9 +61,9 @@ std::string sha256(const std::string &input)
 
     return hashedPassword;
 }
-bool checkPassword(const std::string &inputPassword, const std::string &storedHash)
+bool checkPassword(const std::string &inputPassword, const std::string &storedHash, const std::string &storedSalt)
 {
-    return sha256(inputPassword) == storedHash;
+    return sha256(inputPassword + storedSalt) == storedHash;
 }
 void writeToFile(const UserInfo &user)
 {
@@ -81,7 +81,24 @@ void writeToFile(const UserInfo &user)
         std::cerr << "Error Opening File\n";
     }
 }
+void writeToHashSaltFile(const UserInfo &user)
+{
+    std::ofstream hashSaltFile("users_with_salt.txt", std::ios::app);
 
+    if (hashSaltFile.is_open())
+    {
+        std::string salt = generateSalt();
+        std::string saltedPassword = user.password + salt;
+        hashSaltFile << user.email << ":" << sha256(saltedPassword) << ":" << salt;
+        hashSaltFile << "\n";
+        hashSaltFile.close();
+        std::cout << "User Information successfully added\n";
+    }
+    else
+    {
+        std::cerr << "Error Opening File\n";
+    }
+}
 bool doesEmailExist(const std::string &emailToCheck)
 {
     std::ifstream inFile("users.txt");
@@ -122,8 +139,12 @@ UserInfo createUser()
     }
     std::cout << "Passwords Must Contain\n - At least 8 Characters\n - At least one uppercase letter\n - At least one lowercase letter\n - At least one digit\n - At least one special character" << std::endl;
     std::cout << "Enter Desired Password\n";
+    // Generera saltat lösenord
     std::cin >> user.password;
-    sha256(user.password);
+    std::string salt = generateSalt();
+    std::string saltedPassword = user.password + salt;
+    // sha256(user.password);
+    sha256(saltedPassword);
     // getPassword(user.password);
 
     if (!user.isValidPassword())
@@ -132,8 +153,8 @@ UserInfo createUser()
         return user;
     }
     // Writes to File
-    writeToFile(user);
-
+    // writeToFile(user);
+    writeToHashSaltFile(user);
     return user;
 }
 void trimWhitespace(std::string &str)
@@ -145,7 +166,8 @@ int loggedIn()
 {
     std::string login_email;
     std::string login_password;
-    std::fstream pull("users.txt", std::ios::in);
+    // std::fstream pull("users.txt", std::ios::in);
+    std::ifstream pull("users_with_salt.txt");
     if (!pull.is_open())
     {
         std::cout << "File not loaded!" << std::endl;
@@ -158,27 +180,51 @@ int loggedIn()
     std::string line;
     while (std::getline(pull, line))
     {
-        size_t pos = line.find(":");
-        if (pos != std::string::npos)
-        {
-            std::string stored_email = line.substr(0, pos);
-            std::string stored_password = line.substr(pos + 1);
-            if (login_email == stored_email)
-            {
-                std::cout << "Enter password: ";
-                std::cin >> login_password;
+        // size_t pos = line.find(":");
+        // if (pos != std::string::npos)
+        //{
+        //  --------- WITHOUT HASHING AND SALTING ---------
+        //  std::string stored_email = line.substr(0, pos);
+        //  std::string stored_password = line.substr(pos + 1);
+        //  if (login_email == stored_email)
+        //  {
+        //      std::cout << "Enter password: ";
+        //      std::cin >> login_password;
 
-                while (sha256(login_password) != stored_password)
-                {
-                    std::cout << "Wrong Password. Try again\nEnter Password: ";
-                    std::cin >> login_password;
-                }
-                std::cout << "Login Successful" << std::endl;
-                pull.close();
-                pull.open("users.txt", std::ios::in);
-                return 0;
+        //     while (sha256(login_password) != stored_password)
+        //     {
+        //         std::cout << "Wrong Password. Try again\nEnter Password: ";
+        //         std::cin >> login_password;
+        //     }
+        //     std::cout << "Login Successful" << std::endl;
+        //     pull.close();
+        //     pull.open("users.txt", std::ios::in);
+        //     return 0;
+        // -------------------------------------------------
+        std::istringstream iss(line);
+        std::string stored_email, stored_password, stored_salt;
+        std::getline(iss, stored_email, ':');
+        std::getline(iss, stored_password, ':');
+        std::getline(iss, stored_salt);
+        if (login_email == stored_email)
+        {
+            std::cout << "Enter password: ";
+            std::cin >> login_password;
+            std::string saltedPassword = login_password + stored_salt;
+            while (sha256(saltedPassword) != stored_password)
+            {
+                std::cout << saltedPassword << std::endl;
+                std::cout << stored_password << std::endl;
+                std::cout << "Wrong Password. Try again\nEnter Password: ";
+                std::cin >> login_password;
+                saltedPassword = login_password + stored_salt;
             }
+            std::cout << "Login Successful" << std::endl;
+            pull.close();
+            pull.open("users_with_salt.txt", std::ios::in);
+            return 0;
         }
+        //}
     }
     std::cout << "Email not found." << std::endl;
     pull.close();

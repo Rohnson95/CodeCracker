@@ -4,6 +4,11 @@
       "cwd": "c:\\Users\\Robert\\Documents\\Nackademin\\cpp\\pwHandler",
       "binaryPath": "c:\\Users\\Robert\\Documents\\Nackademin\\cpp\\pwHandler\\main_debug.exe",
       "binaryArgs": []
+    },
+    {
+      "cwd": "c:\\Users\\Robert\\Documents\\Projects\\nackademin\\CodeCracker",
+      "binaryPath": "c:\\Users\\Robert\\Documents\\Projects\\nackademin\\CodeCracker\\main_debug.exe",
+      "binaryArgs": []
     }
   ],
   "files.associations": {
@@ -75,6 +80,8 @@
     "string_view": "cpp",
     "numbers": "cpp",
     "sstream": "cpp",
-    "cinttypes": "cpp"
+    "cinttypes": "cpp",
+    "span": "cpp",
+    "variant": "cpp"
   }
 }
