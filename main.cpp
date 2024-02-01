@@ -7,6 +7,7 @@
 #include <limits>
 #include <openssl/evp.h>
 #include <openssl/rand.h>
+#include "passwordCracker.h"
 struct UserInfo
 {
     std::string email;
@@ -236,7 +237,7 @@ void login()
     int choice;
     do
     {
-        std::cout << "1. Create User\n2. Test Login\n3. Exit\n";
+        std::cout << "1. Create User\n2. Test Login\n4. crackPasswords\n3. Exit\n";
         std::cout << "Input: ";
         std::cin >> choice;
 
@@ -251,6 +252,10 @@ void login()
         case 3:
             std::cout << "Exiting Program.\n";
             return;
+        case 4:
+            // hashPasswords();
+            mainCracker();
+            break;
         default:
             std::cout << "Invalid choice. Try again.\n";
         }
