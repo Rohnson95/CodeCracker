@@ -1,5 +1,5 @@
 PROG=main.exe
-SOURCES=main.cpp
+SOURCES=main.cpp passwordCracker.cpp
 DEPS=
 CC=g++
 CFLAGS=-Wall  -std=c++20
