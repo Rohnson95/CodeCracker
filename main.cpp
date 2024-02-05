@@ -237,7 +237,7 @@ void login()
     int choice;
     do
     {
-        std::cout << "1. Create User\n2. Test Login\n4. crackPasswords\n3. Exit\n";
+        std::cout << "1. Create User\n2. Test Login\n3. crackPasswords\n4. Exit\n";
         std::cout << "Input: ";
         std::cin >> choice;
 
@@ -250,12 +250,12 @@ void login()
             loggedIn();
             break;
         case 3:
-            std::cout << "Exiting Program.\n";
-            return;
-        case 4:
             // hashPasswords();
             mainCracker();
             break;
+        case 4:
+            std::cout << "Exiting Program.\n";
+            return;
         default:
             std::cout << "Invalid choice. Try again.\n";
         }

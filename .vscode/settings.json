@@ -9,6 +9,11 @@
       "cwd": "c:\\Users\\Robert\\Documents\\Projects\\nackademin\\CodeCracker",
       "binaryPath": "c:\\Users\\Robert\\Documents\\Projects\\nackademin\\CodeCracker\\main_debug.exe",
       "binaryArgs": []
+    },
+    {
+      "cwd": "c:\\Users\\rober\\Documents\\nackademin\\CodeCracker",
+      "binaryPath": "c:\\Users\\rober\\Documents\\nackademin\\CodeCracker\\main_debug.exe",
+      "binaryArgs": []
     }
   ],
   "files.associations": {
