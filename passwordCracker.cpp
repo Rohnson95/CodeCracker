@@ -87,39 +87,106 @@ int hashPasswords()
 // create a function that takes a hash and checks it against the sorted_common_passwords.txt file
 // if there is a match, print the plaintext password
 // if there is no match, print "Password not found"
+std::string getPasswordFromHash(std::ifstream &file, const std::string &hashToFind)
+{
+    std::string line;
+    std::streampos start = 0;
+    file.seekg(0, std::ios::end);
+    std::streampos end = file.tellg();
 
+    while (start <= end)
+    {
+        std::streampos mid = (start + end) / 2;
+        file.seekg(mid);
+
+        // Find the start of the line
+        while (file.peek() != '\n' && mid > 0)
+        {
+            mid = mid - std::streamoff(1);
+            file.seekg(mid);
+        }
+
+        // If we're not at the start of the file, ignore the newline character
+        if (mid > 0)
+        {
+            file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+
+        // Store the start of the line
+        std::streampos lineStart = file.tellg();
+
+        std::getline(file, line);
+
+        std::string delimiter = ":";
+        size_t delimiterPos = line.find(delimiter);
+        std::string fileHash = line.substr(delimiterPos + 1);
+
+        if (fileHash == hashToFind)
+        {
+            return line.substr(0, delimiterPos);
+        }
+        else if (fileHash < hashToFind)
+        {
+            start = lineStart + std::streamoff(line.size() + 1); // +1 for the newline character
+        }
+        else
+        {
+            end = lineStart - std::streamoff(1);
+        }
+    }
+    return "";
+}
 int mainCracker()
 {
+    // std::ifstream passwordFile("sorted_common_passwords.txt");
+    // if (!passwordFile.is_open())
+    // {
+    //     std::cout << "Failed to open password file" << std::endl;
+    //     return 1;
+    // }
+    // std::vector<std::pair<std::string, std::string>> passwordHashPairs;
+    // std::string line;
+    // while (std::getline(passwordFile, line))
+    // {
+    //     std::istringstream iss(line);
+    //     std::string password, fileHash;
+    //     std::getline(iss, password, ':');
+    //     std::getline(iss, fileHash);
+    //     passwordHashPairs.push_back({fileHash, password});
+    // }
+
+    // std::string inputHash;
+    // std::cout << "Enter a hash: ";
+    // std::cin >> inputHash;
+
+    // auto it = std::lower_bound(passwordHashPairs.begin(), passwordHashPairs.end(), inputHash,
+    //                            [](const std::pair<std::string, std::string> &pair, const std::string &hash)
+    //                            {
+    //                                return pair.first < hash;
+    //                            });
+
+    // if (it != passwordHashPairs.end() && it->first == inputHash)
+    // {
+    //     std::cout << "Match found! Password is: " << it->second << std::endl;
+    // }
+    // else
+    // {
+    //     std::cout << "Password not found" << std::endl;
+    // }
     std::ifstream passwordFile("sorted_common_passwords.txt");
     if (!passwordFile.is_open())
     {
         std::cout << "Failed to open password file" << std::endl;
         return 1;
     }
-    std::vector<std::pair<std::string, std::string>> passwordHashPairs;
-    std::string line;
-    while (std::getline(passwordFile, line))
-    {
-        std::istringstream iss(line);
-        std::string password, fileHash;
-        std::getline(iss, password, ':');
-        std::getline(iss, fileHash);
-        passwordHashPairs.push_back({fileHash, password});
-    }
-
     std::string inputHash;
     std::cout << "Enter a hash: ";
     std::cin >> inputHash;
 
-    auto it = std::lower_bound(passwordHashPairs.begin(), passwordHashPairs.end(), inputHash,
-                               [](const std::pair<std::string, std::string> &pair, const std::string &hash)
-                               {
-                                   return pair.first < hash;
-                               });
-
-    if (it != passwordHashPairs.end() && it->first == inputHash)
+    std::string password = getPasswordFromHash(passwordFile, inputHash);
+    if (!password.empty())
     {
-        std::cout << "Match found! Password is: " << it->second << std::endl;
+        std::cout << "Match found! Password is: " << password << std::endl;
     }
     else
     {
