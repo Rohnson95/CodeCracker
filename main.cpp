@@ -5,6 +5,7 @@
 #include <fstream>
 #include <conio.h>
 #include <limits>
+#include <chrono>
 #include <openssl/evp.h>
 #include <openssl/rand.h>
 #include "passwordCracker.h"
@@ -260,7 +261,7 @@ void login()
             std::cout << "Invalid choice. Try again.\n";
         }
         std::cin.clear();
-    } while (choice != 3);
+    } while (choice != 4);
 }
 int main()
 {

@@ -5,6 +5,7 @@
 #include <fstream>
 #include <conio.h>
 #include <limits>
+#include <chrono>
 #include <openssl/evp.h>
 #include <openssl/rand.h>
 #include "passwordCracker.h"
@@ -110,7 +111,7 @@ int mainCracker()
     std::string inputHash;
     std::cout << "Enter a hash: ";
     std::cin >> inputHash;
-
+    auto startTime = std::chrono::high_resolution_clock::now();
     auto it = std::lower_bound(passwordHashPairs.begin(), passwordHashPairs.end(), inputHash,
                                [](const std::pair<std::string, std::string> &pair, const std::string &hash)
                                {
@@ -125,6 +126,8 @@ int mainCracker()
     {
         std::cout << "Password not found" << std::endl;
     }
+    auto endTime = std::chrono::high_resolution_clock::now();
+    std::cout << "took: " << std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count() << "microseconds" << std::endl;
     passwordFile.close();
     return 0;
 }
