@@ -40,3 +40,33 @@ This program is a simple password management system that allows users to create 
 
 ---
 Feel free to extend and modify this code according to your needs! If you have any questions or suggestions, please don't hesitate to reach out.
+
+# Password Cracker
+
+This program includes a basic password cracker functionality that allows users to input a hash and attempts to find the corresponding password from a sorted list of common passwords.
+
+## Features
+
+- **Hash Passwords:** The program hashes a list of common passwords and sorts them for efficient searching.
+- **Password Cracking:** Users can input a hash, and the program will attempt to find the corresponding password.
+- **Efficient Search:** Utilizes binary search for quick password lookup.
+
+## How to Use
+
+1. **Compile the Code:** Compile the provided code using a C++ compiler.
+   
+2. **Run the Program:** Execute the compiled program.
+
+3. **Enter Hash:** Input the hash you want to crack when prompted.
+
+4. **View Result:** The program will display the corresponding password if found, along with the time taken for the operation.
+
+## Requirements
+
+- C++ Compiler
+- OpenSSL Library
+
+## File Structure
+
+- **commonPasswords.txt:** File containing a list of common passwords.
+- **sorted_common_passwords.txt:** File containing sorted common passwords along with their hashes.
